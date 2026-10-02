@@ -1,0 +1,21 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "kodehawa"
+            }
+        ],
+        "BugReportUrl": "https://github.com/eepymoonshine/plasma-simple-weather/issues",
+        "Category": "Environment and Weather",
+        "Description": "Current weather as an emoji and temperature in your panel, with hourly and 7-day forecasts. Data from Open-Meteo.",
+        "EnabledByDefault": true,
+        "Icon": "weather-few-clouds",
+        "Id": "com.github.eepymoonshine.simpleweather",
+        "License": "GPL-3.0-or-later",
+        "Name": "Simple Weather",
+        "Version": "1.0",
+        "Website": "https://github.com/eepymoonshine/plasma-simple-weather"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+      http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+    <kcfgfile name=""/>
+
+    <group name="General">
+        <entry name="locationName" type="String">
+            <label>Display name of the chosen location (empty = not set)</label>
+            <default></default>
+        </entry>
+        <entry name="latitude" type="Double">
+            <label>Latitude of the chosen location</label>
+            <default>0</default>
+        </entry>
+        <entry name="longitude" type="Double">
+            <label>Longitude of the chosen location</label>
+            <default>0</default>
+        </entry>
+        <entry name="temperatureUnit" type="String">
+            <label>Temperature unit (celsius or fahrenheit)</label>
+            <default>celsius</default>
+        </entry>
+        <entry name="windUnit" type="String">
+            <label>Wind speed unit (kmh, mph, ms or kn)</label>
+            <default>kmh</default>
+        </entry>
+        <entry name="refreshInterval" type="Int">
+            <label>Refresh interval in minutes</label>
+            <default>15</default>
+        </entry>
+        <entry name="showEmoji" type="Bool">
+            <label>Show the weather emoji in the panel</label>
+            <default>true</default>
+        </entry>
+        <entry name="showUnit" type="Bool">
+            <label>Show the unit letter after the temperature in the panel</label>
+            <default>true</default>
+        </entry>
+        <entry name="panelFontFamily" type="String">
+            <label>Font family for the panel temperature (empty = theme font)</label>
+            <default></default>
+        </entry>
+        <entry name="panelFontSize" type="Double">
+            <label>Font size in points for the panel temperature (0 = automatic)</label>
+            <default>0</default>
+        </entry>
+        <entry name="panelFontBold" type="Bool">
+            <label>Bold panel temperature</label>
+            <default>true</default>
+        </entry>
+    </group>
+</kcfg>
