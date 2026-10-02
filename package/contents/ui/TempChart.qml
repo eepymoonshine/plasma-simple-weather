@@ -4,8 +4,8 @@
 
 import QtQuick
 
-// Temperature line over the next hours, with faint rain-chance bars underneath.
-// Each sample sits in the middle of its own column, so labels can line up with it.
+// Temperature line for the next hours, with rain chance bars underneath.
+// Samples sit in the middle of their column so labels can line up with them.
 Canvas {
     id: chart
 

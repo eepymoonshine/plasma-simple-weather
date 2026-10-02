@@ -18,8 +18,7 @@ Item {
 
     Layout.minimumWidth: Kirigami.Units.gridUnit * 19
     Layout.preferredWidth: Kirigami.Units.gridUnit * 21
-    // Exactly as tall as the content. Plasma reopens popups at their last saved size, which
-    // otherwise leaves empty space at the bottom once the content is shorter.
+    // Fit the content exactly, or Plasma's saved popup size can leave a gap at the bottom
     readonly property real contentHeight: mainColumn.implicitHeight + Kirigami.Units.smallSpacing * 2
     Layout.minimumHeight: contentHeight
     Layout.preferredHeight: contentHeight
@@ -174,7 +173,7 @@ Item {
             }
         }
 
-        // Errors: a full card with nothing to show, a short notice when showing older data
+        // Errors (softer when we still have older data to show)
         Rectangle {
             visible: root.hasLocation && root.errorMsg !== ""
             Layout.fillWidth: true
@@ -251,7 +250,7 @@ Item {
         RowLayout {
             visible: full.hasData
             Layout.fillWidth: true
-            // Don't stretch into spare popup height, or the cards resize when rows appear below
+            // Don't stretch, or the cards resize when rows appear below
             Layout.fillHeight: false
             spacing: Kirigami.Units.mediumSpacing
 
@@ -416,8 +415,8 @@ Item {
             visible: full.hasData
             SectionTitle { text: i18n("Details") }
             DetailRow { label: i18n("Wind"); value: full.hasData ? root.formatWind(root.current.wind, root.current.windDir) : "" }
-            DetailRow { label: i18n("Precipitation"); value: full.hasData ? root.current.precip.toLocaleString(Qt.locale(), 'f', 1) + " mm" : "" }
-            DetailRow { label: i18n("Pressure"); value: full.hasData ? Math.round(root.current.pressure) + " hPa" : "" }
+            DetailRow { label: i18n("Precipitation"); value: full.hasData ? (root.current.precip || 0).toLocaleString(Qt.locale(), 'f', 1) + " mm" : "" }
+            DetailRow { label: i18n("Pressure"); value: full.hasData && root.current.pressure ? Math.round(root.current.pressure) + " hPa" : "" }
             DetailRow { label: i18n("Sunrise"); value: root.daily.length ? root.formatHour(root.daily[0].sunrise) : "" }
             DetailRow { label: i18n("Sunset"); value: root.daily.length ? root.formatHour(root.daily[0].sunset) : "" }
         }
@@ -455,6 +454,5 @@ Item {
                 QQC2.ToolTip.visible: hovered
             }
         }
-
     }
 }

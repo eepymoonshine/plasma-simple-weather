@@ -42,8 +42,7 @@ KCM.SimpleKCM {
         }
     }
 
-    // Combo bound to a string setting. Selected after load, since a binding runs too early
-    // and gets stuck on the first item.
+    // Combo for a string setting, selected after load so it doesn't stick on the first item
     component ValueComboBox: QQC2.ComboBox {
         property string current
         signal picked(string value)
@@ -72,7 +71,11 @@ KCM.SimpleKCM {
                 searchError = i18n("Couldn't reach Open-Meteo")
                 return
             }
-            results = JSON.parse(xhr.responseText).results || []
+            try {
+                results = JSON.parse(xhr.responseText).results || []
+            } catch (e) {
+                results = []
+            }
             if (results.length === 0) searchError = i18n("No places found")
         }
         xhr.open("GET", "https://geocoding-api.open-meteo.com/v1/search?count=8&name="
@@ -134,6 +137,7 @@ KCM.SimpleKCM {
                         cfg_latitude = modelData.latitude
                         cfg_longitude = modelData.longitude
                         page.results = []
+                        page.searchError = ""
                         searchField.text = ""
                     }
                 }
@@ -191,7 +195,7 @@ KCM.SimpleKCM {
                 editable: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 14
                 model: Qt.fontFamilies()
-                // Ignore changes while loading, or the first font in the list overwrites the setting
+                // Ignore changes while loading, or the first font in the list wins
                 property bool loaded: false
                 Component.onCompleted: {
                     var fam = cfg_panelFontFamily || Kirigami.Theme.defaultFont.family

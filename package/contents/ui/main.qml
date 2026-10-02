@@ -24,6 +24,7 @@ PlasmoidItem {
     property string errorMsg: ""
     property bool loading: false
     property double lastSuccess: 0
+    property var pendingRequest: null
 
     readonly property var currentInfo: current ? weatherInfo(current.code, current.isDay) : weatherInfo(-1, true)
 
@@ -39,8 +40,7 @@ PlasmoidItem {
         + "&temperature_unit=" + (fahrenheit ? "fahrenheit" : "celsius")
         + "&wind_speed_unit=" + windUnit
 
-    // Name, latitude and longitude change one after another when a location is picked, so wait
-    // for them to settle instead of firing a request for each half-updated location
+    // Picking a place sets name, latitude and longitude one by one, so wait for all three
     onForecastUrlChanged: settleTimer.restart()
     Component.onCompleted: refresh()
 
@@ -50,11 +50,11 @@ PlasmoidItem {
         onTriggered: root.refresh()
     }
 
-    property var pendingRequest: null
-
     function refresh() {
-        if (pendingRequest) pendingRequest.abort()
+        // Clear it first, abort() calls the old handler right away
+        var old = pendingRequest
         pendingRequest = null
+        if (old) old.abort()
         if (!hasLocation) {
             current = null; hourly = []; daily = []; errorMsg = ""; loading = false
             return
@@ -65,7 +65,7 @@ PlasmoidItem {
         pendingRequest = xhr
         xhr.onreadystatechange = function() {
             if (xhr.readyState !== XMLHttpRequest.DONE) return
-            // A newer request replaced this one, or the location changed meanwhile
+            // Ignore answers for an old request or an old location
             if (xhr !== pendingRequest || url !== forecastUrl) return
             pendingRequest = null
             loading = false
@@ -82,7 +82,7 @@ PlasmoidItem {
                 var reason = ""
                 try { reason = JSON.parse(xhr.responseText).reason || "" } catch (e) {}
                 errorMsg = reason !== "" ? reason : i18n("Couldn't reach Open-Meteo")
-                // Offline at login is common; try again soon rather than waiting a full interval
+                // Try again soon, e.g. if we were offline at login
                 retryTimer.restart()
             }
         }
@@ -136,7 +136,7 @@ PlasmoidItem {
         onTriggered: root.refresh()
     }
 
-    // WMO weather codes -> emoji and description. ️ forces the color emoji form.
+    // WMO weather codes to emoji and a short description
     function weatherInfo(code, isDay) {
         switch (code) {
         case 0: return { emoji: isDay ? "☀️" : "🌙", text: i18n("Clear sky") }
@@ -183,7 +183,7 @@ PlasmoidItem {
     function formatHour(s) {
         return Qt.formatTime(parseLocal(s), Qt.locale().timeFormat(Locale.ShortFormat))
     }
-    // Just the hour for chart labels: "6 PM" or "18:00", following the locale's clock style
+    // Hour only for chart labels, like "6 PM" or "18:00"
     function formatHourShort(s) {
         var twelveHour = /a/i.test(Qt.locale().timeFormat(Locale.ShortFormat))
         return Qt.formatTime(parseLocal(s), twelveHour ? "h AP" : "HH:mm")
