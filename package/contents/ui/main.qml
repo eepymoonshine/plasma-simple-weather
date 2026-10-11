@@ -10,6 +10,9 @@ import org.kde.kirigami as Kirigami
 PlasmoidItem {
     id: root
 
+    // Half the theme's card rounding
+    readonly property real cardRadius: Math.max(2, Math.round(Kirigami.Units.cornerRadius / 2))
+
     // Settings
     readonly property string locationName: Plasmoid.configuration.locationName || ""
     readonly property bool hasLocation: locationName !== ""

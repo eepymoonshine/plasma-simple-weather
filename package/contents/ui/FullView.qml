@@ -47,7 +47,7 @@ Item {
     component Card: Rectangle {
         default property alias content: inner.data
         Layout.fillWidth: true
-        radius: Kirigami.Units.cornerRadius
+        radius: root.cardRadius
         color: full.cardColor
         implicitHeight: inner.implicitHeight + Kirigami.Units.mediumSpacing * 2
 
@@ -69,7 +69,7 @@ Item {
         Layout.fillWidth: true
         Layout.fillHeight: true
         Layout.preferredWidth: 1   // equal thirds
-        radius: Kirigami.Units.cornerRadius
+        radius: root.cardRadius
         color: full.cardColor
         implicitHeight: ringCol.implicitHeight + Kirigami.Units.mediumSpacing * 2
 
@@ -177,7 +177,7 @@ Item {
         Rectangle {
             visible: root.hasLocation && root.errorMsg !== ""
             Layout.fillWidth: true
-            radius: Kirigami.Units.cornerRadius
+            radius: root.cardRadius
             color: Qt.alpha(full.hasData ? Kirigami.Theme.neutralTextColor : Kirigami.Theme.negativeTextColor, 0.12)
             implicitHeight: errorLabel.implicitHeight + Kirigami.Units.largeSpacing * 2
 
