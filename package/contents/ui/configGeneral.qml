@@ -21,7 +21,8 @@ KCM.SimpleKCM {
     property alias cfg_showUnit: showUnit.checked
     property string cfg_panelFontFamily
     property real cfg_panelFontSize
-    property alias cfg_panelFontBold: fontBold.checked
+    property int cfg_panelFontWeight
+    property alias cfg_panelFontItalic: fontItalic.checked
 
     // Spin box with a unit, e.g. value 85 with scale 10 shows "8,5 pt"
     component UnitSpinBox: QQC2.SpinBox {
@@ -42,10 +43,10 @@ KCM.SimpleKCM {
         }
     }
 
-    // Combo for a string setting, selected after load so it doesn't stick on the first item
+    // Combo for a setting, selected after load so it doesn't stick on the first item
     component ValueComboBox: QQC2.ComboBox {
-        property string current
-        signal picked(string value)
+        property var current
+        signal picked(var value)
         textRole: "text"
         valueRole: "value"
         Component.onCompleted: currentIndex = Math.max(0, indexOfValue(current))
@@ -229,6 +230,27 @@ KCM.SimpleKCM {
             }
         }
 
-        QQC2.CheckBox { id: fontBold; text: i18n("Bold temperature") }
+        RowLayout {
+            spacing: Kirigami.Units.largeSpacing
+            Kirigami.FormData.label: i18n("Style:")
+            // Fonts without the chosen weight fall back to the closest one they have
+            ValueComboBox {
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                model: [
+                    { text: i18n("Thin"), value: Font.Thin },
+                    { text: i18n("Extra Light"), value: Font.ExtraLight },
+                    { text: i18n("Light"), value: Font.Light },
+                    { text: i18n("Regular"), value: Font.Normal },
+                    { text: i18n("Medium"), value: Font.Medium },
+                    { text: i18n("Semi Bold"), value: Font.DemiBold },
+                    { text: i18n("Bold"), value: Font.Bold },
+                    { text: i18n("Extra Bold"), value: Font.ExtraBold },
+                    { text: i18n("Black"), value: Font.Black }
+                ]
+                current: cfg_panelFontWeight
+                onPicked: function(value) { cfg_panelFontWeight = value }
+            }
+            QQC2.CheckBox { id: fontItalic; text: i18n("Italic") }
+        }
     }
 }

@@ -14,7 +14,8 @@ Item {
     readonly property string fontFamily: Plasmoid.configuration.panelFontFamily || Kirigami.Theme.defaultFont.family
     readonly property real fontSize: Plasmoid.configuration.panelFontSize > 0
         ? Plasmoid.configuration.panelFontSize : Kirigami.Theme.defaultFont.pointSize
-    readonly property bool fontBold: Plasmoid.configuration.panelFontBold !== false
+    readonly property int fontWeight: Plasmoid.configuration.panelFontWeight || Font.Bold
+    readonly property bool fontItalic: Plasmoid.configuration.panelFontItalic === true
 
     Layout.minimumWidth: row.implicitWidth + Kirigami.Units.largeSpacing * 2
     Layout.preferredWidth: Layout.minimumWidth
@@ -39,6 +40,14 @@ Item {
         columnSpacing: Kirigami.Units.smallSpacing
         rowSpacing: 0
 
+        // Center the digits in the panel. Centering the line box instead leaves them about
+        // a pixel high: layout rounding and baseline snapping add up
+        transform: Translate {
+            y: root.isVertical ? 0 : Math.round((compact.height - digitMetrics.tightBoundingRect.height) / 2)
+                    - (Math.round(row.y + tempLabel.y + tempLabel.baselineOffset) + digitMetrics.tightBoundingRect.y)
+        }
+        TextMetrics { id: digitMetrics; font: tempLabel.font; text: "0" }
+
         // Separate label so the emoji font's taller line doesn't shift the temperature
         PlasmaComponents.Label {
             visible: Plasmoid.configuration.showEmoji !== false || !root.hasLocation
@@ -49,6 +58,7 @@ Item {
         }
 
         PlasmaComponents.Label {
+            id: tempLabel
             visible: root.hasLocation
             Layout.alignment: Qt.AlignCenter
             text: root.current
@@ -56,7 +66,10 @@ Item {
                 : (root.errorMsg !== "" ? "⚠" : "--°")
             font.pointSize: compact.fontSize
             font.family: compact.fontFamily
-            font.bold: compact.fontBold
+            // Cleared so the theme font's style name (e.g. "Text") doesn't override the weight
+            font.styleName: ""
+            font.weight: compact.fontWeight
+            font.italic: compact.fontItalic
             font.features: ({ "tnum": 1 })
         }
     }

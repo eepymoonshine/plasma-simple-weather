@@ -46,9 +46,13 @@
             <label>Font size in points for the panel temperature (0 = automatic)</label>
             <default>0</default>
         </entry>
-        <entry name="panelFontBold" type="Bool">
-            <label>Bold panel temperature</label>
-            <default>true</default>
+        <entry name="panelFontWeight" type="Int">
+            <label>Font weight for the panel temperature (100 = thin ... 900 = black)</label>
+            <default>700</default>
+        </entry>
+        <entry name="panelFontItalic" type="Bool">
+            <label>Italic panel temperature</label>
+            <default>false</default>
         </entry>
     </group>
 </kcfg>
