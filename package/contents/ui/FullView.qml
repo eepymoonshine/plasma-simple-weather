@@ -7,22 +7,22 @@ import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 import org.kde.plasma.plasmoid
 import org.kde.plasma.components as PlasmaComponents
+import org.kde.plasma.extras as PlasmaExtras
 import org.kde.kirigami as Kirigami
+import org.kde.ksvg as KSvg
 
-Item {
+PlasmaExtras.Representation {
     id: full
-    clip: true
 
-    readonly property color cardColor: Qt.alpha(Kirigami.Theme.textColor, 0.07)
     readonly property bool hasData: root.current !== null
 
     Layout.minimumWidth: Kirigami.Units.gridUnit * 19
     Layout.preferredWidth: Kirigami.Units.gridUnit * 21
     // Fit the content exactly, or Plasma's saved popup size can leave a gap at the bottom
-    readonly property real contentHeight: mainColumn.implicitHeight + Kirigami.Units.smallSpacing * 2
-    Layout.minimumHeight: contentHeight
-    Layout.preferredHeight: contentHeight
-    Layout.maximumHeight: contentHeight
+    Layout.minimumHeight: implicitHeight
+    Layout.preferredHeight: implicitHeight
+    Layout.maximumHeight: implicitHeight
+    spacing: Kirigami.Units.smallSpacing
 
     // Ticks the "Updated … ago" text
     property double now: Date.now()
@@ -44,11 +44,11 @@ Item {
         opacity: 0.55
     }
 
-    component Card: Rectangle {
+    component Card: KSvg.FrameSvgItem {
         default property alias content: inner.data
         Layout.fillWidth: true
-        radius: root.cardRadius
-        color: full.cardColor
+        imagePath: "widgets/frame"
+        prefix: "plain"
         implicitHeight: inner.implicitHeight + Kirigami.Units.mediumSpacing * 2
 
         ColumnLayout {
@@ -59,7 +59,7 @@ Item {
         }
     }
 
-    component RingCard: Rectangle {
+    component RingCard: KSvg.FrameSvgItem {
         id: ringCard
         property string title
         property real percent
@@ -69,8 +69,8 @@ Item {
         Layout.fillWidth: true
         Layout.fillHeight: true
         Layout.preferredWidth: 1   // equal thirds
-        radius: root.cardRadius
-        color: full.cardColor
+        imagePath: "widgets/frame"
+        prefix: "plain"
         implicitHeight: ringCol.implicitHeight + Kirigami.Units.mediumSpacing * 2
 
         ColumnLayout {
@@ -112,18 +112,8 @@ Item {
 
     // Layout
 
-    ColumnLayout {
-        id: mainColumn
-        anchors.fill: parent
-        anchors.topMargin: Kirigami.Units.smallSpacing
-        anchors.bottomMargin: Kirigami.Units.smallSpacing
-        anchors.leftMargin: Kirigami.Units.mediumSpacing
-        anchors.rightMargin: Kirigami.Units.mediumSpacing
-        spacing: Kirigami.Units.smallSpacing
-
-        // Header
-        RowLayout {
-            Layout.fillWidth: true
+    header: PlasmaExtras.PlasmoidHeading {
+        contentItem: RowLayout {
             spacing: Kirigami.Units.smallSpacing
 
             Kirigami.Icon {
@@ -131,20 +121,19 @@ Item {
                 Layout.preferredWidth: Kirigami.Units.iconSizes.smallMedium
                 Layout.preferredHeight: Kirigami.Units.iconSizes.smallMedium
             }
-            PlasmaComponents.Label {
+            Kirigami.Heading {
+                level: 1
                 text: i18n("Weather")
-                font.bold: true
-                font.pixelSize: Kirigami.Theme.defaultFont.pixelSize * 1.25
             }
             Item { Layout.fillWidth: true }
 
-            Rectangle {
+            KSvg.FrameSvgItem {
                 visible: root.hasLocation
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 10
                 Layout.preferredWidth: placeLabel.implicitWidth + Kirigami.Units.largeSpacing
                 Layout.preferredHeight: placeLabel.implicitHeight + Kirigami.Units.smallSpacing
-                radius: height / 2
-                color: Qt.alpha(root.accent, 0.18)
+                imagePath: "widgets/viewitem"
+                prefix: "selected"
 
                 PlasmaComponents.Label {
                     id: placeLabel
@@ -153,10 +142,14 @@ Item {
                     text: root.locationName
                     elide: Text.ElideRight
                     font.pixelSize: Kirigami.Theme.smallFont.pixelSize
-                    font.bold: true; color: root.accent
+                    font.bold: true
                 }
             }
         }
+    }
+
+    contentItem: ColumnLayout {
+        spacing: Kirigami.Units.smallSpacing
 
         // No location yet
         Card {
@@ -174,24 +167,13 @@ Item {
         }
 
         // Errors (softer when we still have older data to show)
-        Rectangle {
+        Kirigami.InlineMessage {
             visible: root.hasLocation && root.errorMsg !== ""
             Layout.fillWidth: true
-            radius: root.cardRadius
-            color: Qt.alpha(full.hasData ? Kirigami.Theme.neutralTextColor : Kirigami.Theme.negativeTextColor, 0.12)
-            implicitHeight: errorLabel.implicitHeight + Kirigami.Units.largeSpacing * 2
-
-            PlasmaComponents.Label {
-                id: errorLabel
-                anchors.fill: parent
-                anchors.margins: Kirigami.Units.largeSpacing
-                text: "⚠ " + (full.hasData
-                    ? i18n("Couldn't update, showing earlier data")
-                    : root.errorMsg + " · " + i18n("Retrying in a minute"))
-                color: full.hasData ? Kirigami.Theme.neutralTextColor : Kirigami.Theme.negativeTextColor
-                font.pixelSize: Kirigami.Theme.smallFont.pixelSize
-                wrapMode: Text.WordWrap
-            }
+            type: full.hasData ? Kirigami.MessageType.Warning : Kirigami.MessageType.Error
+            text: full.hasData
+                ? i18n("Couldn't update, showing earlier data")
+                : root.errorMsg + " · " + i18n("Retrying in a minute")
         }
 
         // Loading the first time
@@ -257,7 +239,7 @@ Item {
             RingCard {
                 title: i18n("Humidity")
                 percent: full.hasData ? root.current.humidity : 0
-                ringColor: "#5FB3A1"
+                ringColor: root.humidityColor
             }
             RingCard {
                 title: i18n("Rain chance")
@@ -378,20 +360,23 @@ Item {
                         font.features: ({ "tnum": 1 })
                     }
 
-                    // The day's range on a scale shared by the whole week
-                    Rectangle {
+                    // The day's range on a scale shared by the whole week, on the theme's bar track
+                    KSvg.FrameSvgItem {
                         id: track
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 6
-                        radius: 3
-                        color: Qt.alpha(Kirigami.Theme.textColor, 0.15)
+                        Layout.preferredHeight: barSvg.hasElement("hint-bar-size")
+                            ? barSvg.elementSize("hint-bar-size").height : fixedMargins.top + fixedMargins.bottom
+                        imagePath: "widgets/bar_meter_horizontal"
+                        prefix: "bar-inactive"
                         readonly property real span: Math.max(dailyCard.highest - dailyCard.lowest, 1)
+                        KSvg.Svg { id: barSvg; imagePath: "widgets/bar_meter_horizontal" }
 
+                        // Gradient fill, since the theme's bar only comes in one color
                         Rectangle {
                             x: track.width * (modelData.min - dailyCard.lowest) / track.span
                             width: Math.max(track.width * (modelData.max - modelData.min) / track.span, track.height)
                             height: parent.height
-                            radius: 3
+                            radius: height / 2
                             gradient: Gradient {
                                 orientation: Gradient.Horizontal
                                 GradientStop { position: 0; color: root.tempColor(modelData.min) }
@@ -420,10 +405,10 @@ Item {
             DetailRow { label: i18n("Sunrise"); value: root.daily.length ? root.formatHour(root.daily[0].sunrise) : "" }
             DetailRow { label: i18n("Sunset"); value: root.daily.length ? root.formatHour(root.daily[0].sunset) : "" }
         }
+    }
 
-        // Footer
-        RowLayout {
-            Layout.fillWidth: true
+    footer: PlasmaExtras.PlasmoidHeading {
+        contentItem: RowLayout {
             spacing: Kirigami.Units.smallSpacing
 
             PlasmaComponents.Label {

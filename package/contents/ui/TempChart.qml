@@ -12,8 +12,8 @@ Canvas {
     property var temps: []
     property var pops: []        // rain chance per sample, 0-100
     property var markers: []     // sample indices that get a dot
-    property color lineColor: "#E8A33D"
-    property color rainColor: "#6A9BCC"
+    property color lineColor
+    property color rainColor
 
     function xAt(i) { return width * (i + 0.5) / Math.max(temps.length, 1) }
 

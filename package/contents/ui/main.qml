@@ -10,9 +10,6 @@ import org.kde.kirigami as Kirigami
 PlasmoidItem {
     id: root
 
-    // Half the theme's card rounding
-    readonly property real cardRadius: Math.max(2, Math.round(Kirigami.Units.cornerRadius / 2))
-
     // Settings
     readonly property string locationName: Plasmoid.configuration.locationName || ""
     readonly property bool hasLocation: locationName !== ""
@@ -206,8 +203,14 @@ PlasmoidItem {
         return "#D97757"
     }
 
-    readonly property color accent: "#E8A33D"
-    readonly property color rainColor: "#6A9BCC"
+    // The theme's accent, plus two hue-rotated copies so the series stay distinguishable
+    readonly property color accent: Kirigami.Theme.highlightColor
+    readonly property color rainColor: rotateHue(accent, 1 / 3)
+    readonly property color humidityColor: rotateHue(accent, -1 / 3)
+
+    function rotateHue(c, turns) {
+        return Qt.hsla((Math.max(c.hslHue, 0) + turns + 1) % 1, c.hslSaturation, c.hslLightness, c.a)
+    }
 
     readonly property bool isVertical: Plasmoid.formFactor === PlasmaCore.Types.Vertical
 
